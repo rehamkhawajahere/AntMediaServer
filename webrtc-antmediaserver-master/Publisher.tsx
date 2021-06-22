@@ -121,8 +121,10 @@ export const Publisher = () => {
           facingMode: isFrontCamera ? "user" : "environment",
           mandatory: {
             minFrameRate: 30,
-            minHeight: Dimensions.get("window").height,
-            minWidth: Dimensions.get("window").width,
+            minHeight: 1280,
+            minWidth: 720,
+            // minHeight: Dimensions.get("window").height,
+            // minWidth: Dimensions.get("window").width,
           },
           optional: sourceId,
         },

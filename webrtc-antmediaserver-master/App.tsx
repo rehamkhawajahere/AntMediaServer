@@ -13,5 +13,5 @@ export const App = () => {
       <StackNavigator.Screen name="Publisher" component={Publisher} />
       <StackNavigator.Screen name="Viewer" component={Viewer} />
     </StackNavigator.Navigator>
-  )
+  );
 };
