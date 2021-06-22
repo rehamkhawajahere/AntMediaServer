@@ -83,7 +83,7 @@ export const Publisher = () => {
         console.log("stop called");
       },
       takeCandidate: (data) => {
-        console.log("onIceCandidate remote");
+        console.log("onIceCandidate remote: ", data);
         peerConnection.current?.addIceCandidate({
           candidate: data?.candidate || "",
           sdpMLineIndex: Number(data?.label) || 0,
@@ -91,7 +91,7 @@ export const Publisher = () => {
         });
       },
       takeConfiguration: (data) => {
-        console.log("got answer");
+        console.log("got answer: ", data);
         const answer = data?.sdp || "";
         peerConnection.current?.setRemoteDescription({
           sdp: answer,
@@ -138,6 +138,10 @@ export const Publisher = () => {
 
     getStream();
   }, []);
+
+  useEffect(() => {
+    console.log("Local Stream : ", localStream);
+  }, [localStream]);
 
   useEffect(() => {
     return () => {

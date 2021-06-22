@@ -64,7 +64,7 @@ export const Menu = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Button onPress={() => navigate("Viewer")} title="Viewer" />
-      <Button onPress={() => navigate("Publisher")} title="Publisher" />
+      <Button onPress={() => navigate("PublisherNew")} title="PublisherNew" />
       <Button onPress={() => permissionHandler()} title="Permissions" />
     </View>
   );
