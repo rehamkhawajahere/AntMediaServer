@@ -15,7 +15,7 @@ const STREAM_ID = "reham";
 
 export const Viewer = () => {
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
-
+  const [reconnect, setReconnect] = useState(true);
   const peerConnection = useRef<RTCPeerConnection>();
 
   useEffect(() => {
@@ -39,16 +39,28 @@ export const Viewer = () => {
 
     peerConnection.current.onremovestream = () => console.log("stream removed");
 
-    peerConnection.current.onconnectionstatechange = (event) =>
+    peerConnection.current.onconnectionstatechange = (event) => {
       console.log(
         "state change connection: ",
         peerConnection.current?.connectionState
       );
+      if (
+        peerConnection.current?.connectionState === "new" ||
+        peerConnection.current?.connectionState === "connecting" ||
+        peerConnection.current?.connectionState === "connected"
+      ) {
+        setReconnect(false);
+      } else {
+        setReconnect(true);
+      }
+    };
 
     peerConnection.current.onsignalingstatechange = () =>
       console.log(peerConnection.current?.signalingState);
 
-    peerConnection.current.onicecandidateerror = console.log;
+    peerConnection.current.onicecandidateerror = () => {
+      setReconnect(true);
+    };
 
     peerConnection.current.onicecandidate = (event) => {
       const candidate = event.candidate;
@@ -71,6 +83,7 @@ export const Viewer = () => {
     await peerConnection.current?.setRemoteDescription(remoteDescription);
 
     const answer = await peerConnection.current.createAnswer();
+
     await peerConnection.current.setLocalDescription(answer);
   };
 
@@ -82,7 +95,9 @@ export const Viewer = () => {
           streamId: STREAM_ID,
         });
       },
-      start: async () => {},
+      start: async () => {
+        console.log("start called");
+      },
       stop: () => {
         console.log("stop called");
       },
@@ -119,16 +134,33 @@ export const Viewer = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      reconnectStream(reconnect);
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [reconnect]);
+
+  const reconnectStream = (reconnect: boolean) => {
+    console.log("reconnect: ", reconnect);
+    if (reconnect) {
+      signalingChannel.current.close();
+      signalingChannel.current.open();
+    }
+  };
+
   return (
     <View style={StyleSheet.absoluteFill}>
-      <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+      {/* <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
         <Button title="Play" onPress={() => signalingChannel.current.open()} />
         <Button title="Stop" onPress={() => signalingChannel.current.close()} />
-      </View>
+      </View> */}
       {!!remoteStream && (
         <RTCView
           streamURL={remoteStream?.toURL()}
-          style={{ flex: 1 }}
+          style={{ flex: 1, backgroundColor: "black" }}
           objectFit="cover"
         />
       )}
